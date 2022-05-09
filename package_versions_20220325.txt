@@ -1,0 +1,35 @@
+R version 4.0.2 (2020-06-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Catalina 10.15.7
+
+Matrix products: default
+BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] grid      stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] scales_1.1.1         ggConvexHull_0.1.0   ggrepel_0.9.1        colorspace_2.0-2     writexl_1.4.0       
+ [6] ggthemes_4.2.4       ggbeeswarm_0.7.0     ggridges_0.5.3       circlize_0.4.13      cowplot_1.1.1       
+[11] ComplexHeatmap_2.4.3 lmtest_0.9-39        zoo_1.8-9            betareg_3.1-4        readxl_1.3.1        
+[16] forcats_0.5.1        stringr_1.4.0        dplyr_1.0.7          purrr_0.3.4          readr_2.1.0         
+[21] tidyr_1.1.4          tibble_3.1.6         ggplot2_3.3.5        tidyverse_1.3.1      magrittr_2.0.1      
+
+loaded via a namespace (and not attached):
+ [1] fs_1.5.0            lubridate_1.8.0     RColorBrewer_1.1-2  httr_1.4.2          R.cache_0.15.0     
+ [6] tools_4.0.2         backports_1.3.0     utf8_1.2.2          R6_2.5.1            vipor_0.4.5        
+[11] DBI_1.1.1           nnet_7.3-16         GetoptLong_1.0.5    withr_2.4.2         tidyselect_1.1.1   
+[16] compiler_4.0.2      cli_3.1.0           rvest_1.0.2         xml2_1.3.2          sandwich_3.0-1     
+[21] digest_0.6.28       R.utils_2.11.0      pkgconfig_2.0.3     styler_1.6.2        dbplyr_2.1.1       
+[26] rlang_0.4.12        GlobalOptions_0.1.2 rstudioapi_0.13     shape_1.4.6         generics_0.1.1     
+[31] jsonlite_1.7.2      R.oo_1.24.0         modeltools_0.2-23   Formula_1.2-4       Rcpp_1.0.7         
+[36] munsell_0.5.0       fansi_0.5.0         lifecycle_1.0.1     R.methodsS3_1.8.1   stringi_1.7.5      
+[41] flexmix_2.3-17      plyr_1.8.6          parallel_4.0.2      crayon_1.4.2        lattice_0.20-45    
+[46] haven_2.4.3         hms_1.1.1           pillar_1.6.4        rjson_0.2.20        stats4_4.0.2       
+[51] reprex_2.0.1        glue_1.5.0          modelr_0.1.8        png_0.1-7           vctrs_0.3.8        
+[56] tzdb_0.2.0          cellranger_1.1.0    gtable_0.3.0        clue_0.3-60         assertthat_0.2.1   
+[61] broom_0.7.10        beeswarm_0.4.0      cluster_2.1.2       ellipsis_0.3.2     
