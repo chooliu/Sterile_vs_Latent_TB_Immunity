@@ -34,6 +34,7 @@ predictedvals_stim_nbl_long <-
 
 
 # generic marker plotting fxn ==================================================
+# plots residualized values by default
 
 plot_activation_marker <-
   function(panel_in, celltype_in, marker_in,
@@ -42,6 +43,7 @@ plot_activation_marker <-
            export_prefix = "",
            exclude_BCG = F,
            add_hline = F) {
+    
     if (is.null(ylabel)) {
       ylabel <-
         paste(c(panel_in, celltype_in, marker_in), collapse = " // ") %>%
@@ -89,7 +91,7 @@ plot_activation_marker <-
         plot = plot_out,
         filename = paste0(
           "./FiguresTables/", current_date_label, "/",
-          export_prefix, "_",
+          export_prefix,
           panel_in, "_", celltype_in, "_", marker_in, ".png"
         ),
         width = 3, height = 3
@@ -102,10 +104,7 @@ plot_activation_marker <-
 
 
 
-# plot significant activation markers ==========================================
-
-# plot top from unstim LTBI+/- results
-# resultstable_unstim_lneg_lpos
+# plotting examples, markers ===================================================
 
 # single marker example
 plot_activation_marker(
@@ -121,42 +120,7 @@ plot_activation_marker("APC", "cDC1", "IL10",
 ) +
   facet_grid(~Run)
 
-# loop through all signif unstim markers
-resultstable_unstim_lneg_lpos$Results %>%
-  filter(`Signif (FDR < 0.05)` == "*") %>%
-  select(Panel, CellType, Marker) %>%
-  pmap(function(Panel, CellType, Marker) {
-    plot_activation_marker(Panel, CellType, Marker,
-      inputtable = predictedvals_unstim_long,
-      export_prefix = "residunstim"
-    )
-  })
-
-
-
-# plot top from stim LTBI+/- results (baseline adjusted) -----------------------
-
-# example of plotting one residualized stim marker
-plot_activation_marker(resultstable_stim_lneg_lpos$Results$Panel[1],
-  resultstable_stim_lneg_lpos$Results$CellType[1],
-  resultstable_stim_lneg_lpos$Results$Marker[1],
-  predictedvals_stim_long,
-  ysuffix = "\n(Residualized % of Events, Stim)"
-)
-
-# loop through all signif stim markers
-resultstable_stim_lneg_lpos$Results %>%
-  filter(`Signif (FDR < 0.05)` == "*") %>%
-  select(Panel, CellType, Marker) %>%
-  pmap(function(Panel, CellType, Marker) {
-    plot_activation_marker(Panel, CellType, Marker,
-      inputtable = predictedvals_stim_long,
-      export_prefix = "residstim",
-      ysuffix = "\n(Residualized % of Events, Stim)"
-    )
-  })
-
-# example of plotting stim (with baseline adjustment) raw data
+# plot top from stim LTBI+/- results (baseline adjusted)
 plot_activation_marker(resultstable_stim_lneg_lpos$Results$Panel[1],
   resultstable_stim_lneg_lpos$Results$CellType[1],
   resultstable_stim_lneg_lpos$Results$Marker[1],
@@ -165,12 +129,7 @@ plot_activation_marker(resultstable_stim_lneg_lpos$Results$Panel[1],
 ) +
   facet_grid(~Run)
 
-
-
-
-# or stim, without baseline adjustment ("nbl") ---------------------------------
-
-# example of plotting one residualized stim (nbl) marker
+# or stim, without baseline adjustment ("nbl")
 plot_activation_marker(resultstable_stim_lneg_lpos_nbl$Results$Panel[1],
   resultstable_stim_lneg_lpos_nbl$Results$CellType[1],
   resultstable_stim_lneg_lpos_nbl$Results$Marker[1],
@@ -178,120 +137,81 @@ plot_activation_marker(resultstable_stim_lneg_lpos_nbl$Results$Panel[1],
   ysuffix = "\n(Residualized % of Events, Stim) [nbl]"
 )
 
-# loop through all signif stim (nbl) markers
-resultstable_stim_lneg_lpos_nbl$Results %>%
+
+# all signif results requested for paper, revision 1 ===========================
+
+# loop through all signif unstim markers
+dir.create("./FiguresTables/20220925/Scatterplot_Unstim/")
+resultstable_unstim_lneg_lpos$Results %>%
   filter(`Signif (FDR < 0.05)` == "*") %>%
   select(Panel, CellType, Marker) %>%
-  pmap(function(Panel, CellType, Marker) {
+  mutate(ylabel = paste0(CellType, " ", Marker, "\n(Unstimulated %)")) %>%
+  pmap(function(Panel, CellType, Marker, ylabel) {
     plot_activation_marker(Panel, CellType, Marker,
-      inputtable = predictedvals_stim_nbl_long,
-      export_prefix = "residstimNBL",
-      ysuffix = "\n(Residualized % of Events, Stim) [nbl]"
+                           inputtable = deltas_final %>% mutate(OutcomeOfInterest = Percent_NoStim),
+                           export_prefix = "Scatterplot_Unstim/",
+                           ylabel = ylabel, exclude_BCG = T
     )
   })
 
-# example of plotting stim (nbl) raw data
-plot_activation_marker(resultstable_stim_lneg_lpos_nbl$Results$Panel[1],
-  resultstable_stim_lneg_lpos_nbl$Results$CellType[1],
-  resultstable_stim_lneg_lpos_nbl$Results$Marker[1],
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  export_prefix = "rawstimNBL",
-  ysuffix = "\n(Raw % of Events, Stim) [nbl]"
-) +
-  facet_grid(~Run)
+# loop through all signif stim markers
+dir.create("./FiguresTables/20220925/Scatterplot_Delta/")
+resultstable_stim_lneg_lpos$Results %>%
+  filter(`Signif (FDR < 0.05)` == "*") %>%
+  select(Panel, CellType, Marker) %>%
+  mutate(ylabel = paste0(CellType, " ", Marker, "\n(Δ: stim % - unstim %)")) %>%
+  pmap(function(Panel, CellType, Marker, ylabel) {
+    plot_activation_marker(Panel, CellType, Marker, ylabel = ylabel,
+                           inputtable = deltas_final %>%
+                             mutate(OutcomeOfInterest = Difference),
+                           export_prefix = "Scatterplot_Delta/", exclude_BCG = T
+    )
+  })
+
+# + BCG
+dir.create("./FiguresTables/20220925/Scatterplot_Delta_plusBCG/")
+bind_rows(
+  resultstable_stim_lpos_bcg$Results,
+  resultstable_stim_lneg_bcg$Results) %>%
+  filter(`Signif (FDR < 0.05)` == "*") %>%
+  select(Panel, CellType, Marker) %>%
+  mutate(ylabel = paste0(CellType, " ", Marker, "\n(Δ: stim % - unstim %)")) %>%
+  pmap(function(Panel, CellType, Marker, ylabel) {
+    plot_activation_marker(Panel, CellType, Marker, ylabel = ylabel,
+                           inputtable = deltas_final %>% mutate(OutcomeOfInterest = Difference),
+                           export_prefix = "Scatterplot_Delta_plusBCG/", exclude_BCG = F
+    )
+  })
+
+# loop through all signif stim markers (nbl)
+dir.create("./FiguresTables/20220925/Scatterplot_Stim/")
+resultstable_stim_lneg_lpos_nbl$Results %>%
+  filter(`Signif (FDR < 0.05)` == "*") %>%
+  select(Panel, CellType, Marker) %>%
+  mutate(ylabel = paste0(CellType, " ", Marker, "\nMtb-stimulated %")) %>%
+  pmap(function(Panel, CellType, Marker, ylabel) {
+    plot_activation_marker(Panel, CellType, Marker, ylabel = ylabel,
+                           inputtable = deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
+                           export_prefix = "Scatterplot_Stim/", exclude_BCG = T
+    )
+  })
+
+# + BCG (nbl)
+dir.create("./FiguresTables/20220925/Scatterplot_Stim_plusBCG/")
+bind_rows(
+  resultstable_stim_lpos_bcg_nbl$Results,
+  resultstable_stim_lneg_bcg_nbl$Results) %>%
+  filter(`Signif (FDR < 0.05)` == "*") %>%
+  select(Panel, CellType, Marker) %>%
+  mutate(ylabel = paste0(CellType, " ", Marker, "\nMtb-stimulated %")) %>%
+  pmap(function(Panel, CellType, Marker, ylabel) {
+    plot_activation_marker(Panel, CellType, Marker, ylabel = ylabel,
+                           inputtable = deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
+                           export_prefix = "Scatterplot_Stim_plusBCG/", exclude_BCG = F
+    )
+  })
 
 
-
-
-# final requested for paper, from AW March/April 2022 ==========================
-
-# CD4 and CD8 GranzB stim and unstim -------------------------------------------
-
-plot_activation_marker("TCell", "Tconv CD4+", "GranzB",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_NoStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Unstim_",
-  ylabel = "Tconv CD4+ GranzB+\n(unstimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD4+", "GranzB",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Stim_",
-  ylabel = "Tconv CD4+ GranzB+\n(Mtb-stimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD8+", "GranzB",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_NoStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Unstim_",
-  ylabel = "Tconv CD8+ GranzB+\n(unstimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD8+", "GranzB",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Stim_",
-  ylabel = "Tconv CD8+ GranzB+\n(Mtb-stimulated %)", ysuffix = ""
-)
-
-# CD4 and CD8 PD1 stim and unstim ----------------------------------------------
-
-plot_activation_marker("TCell", "Tconv CD4+", "PD1",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_NoStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Unstim_",
-  ylabel = "Tconv CD4+ PD1+\n(unstimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD8+", "PD1",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_NoStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Unstim_",
-  ylabel = "Tconv CD8+ PD1+\n(unstimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD4+", "PD1",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Stim_",
-  ylabel = "Tconv CD4+ PD1+\n(Mtb-stimulated %)", ysuffix = ""
-)
-
-plot_activation_marker("TCell", "Tconv CD8+", "PD1",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Stim_",
-  ylabel = "Tconv CD8+ PD1+\n(Mtb-stimulated %)", ysuffix = ""
-)
-
-# iNKT CD8 IFNg delta ----------------------------------------------------------
-
-plot_activation_marker("TCell", "iNKT CD8+", "IFNγ",
-  deltas_final %>% mutate(OutcomeOfInterest = Difference),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Delta_",
-  ylabel = "iNKT CD8+ IFNγ+\n(Δ: stim % - unstim %)",
-  ysuffix = "", add_hline = T
-)
-
-# NKT CD107 stim and delta -----------------------------------------------------
-
-plot_activation_marker("TCell", "NK", "CD107a",
-  deltas_final %>% mutate(OutcomeOfInterest = Percent_CMStim),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Stim_",
-  ylabel = "NKT CD107a+\n(Mtb-stimulated %)",
-  ysuffix = "", add_hline = T
-)
-
-plot_activation_marker("TCell", "NK", "CD107a",
-  deltas_final %>% mutate(OutcomeOfInterest = Difference),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Delta_",
-  ylabel = "NKT CD107a+ Mtb-memory\n(Δ: stim % - unstim %)",
-  ysuffix = "", add_hline = T
-)
 
 # phenograph unstim, with and without BCG group --------------------------------
 
@@ -308,16 +228,5 @@ plot_activation_marker("TCell", "Phenograph", "CD8+GMM+GranzB+",
   ylabel = "Phenograph TCell Cluster 26\n(CD8+GMM+GranzB+; unstimulated %)",
   ysuffix = "", exclude_BCG = T
 )
-
-# delta GD CD25+ ---------------------------------------------------------------
-
-plot_activation_marker("TCell", "γδT", "CD25",
-  deltas_final %>% mutate(OutcomeOfInterest = Difference),
-  exclude_BCG = T,
-  export_prefix = "Targeted_Delta_",
-  ylabel = "γδT CD25+\n(Δ: stim % - unstim %)",
-  ysuffix = "", add_hline = T
-)
-
 
 

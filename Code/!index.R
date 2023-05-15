@@ -7,7 +7,8 @@
 
 
 # version control / export date to avoid overwriting
-current_date_label <- "20220325"
+current_date_label <- "20220925"
+dir.create(paste0("./FiguresTables/", current_date_label))
 
 # basic R environment setup
 source("Code/00_load_fxns_and_libraries.R")
@@ -25,7 +26,7 @@ source("Code/07_test_phenograph_clusters.R")
 source("Code/08_phenograph_manual_bcg_cluster.R")
 
 # misc. multivariate 
-source("Code/09_correlation_heatmaps.R") # correlation between markers
+source("Code/09_heatmaps.R") # visualize between-marker correlation, frequencies
 source("Code/10_SPICE_fdr_correct.R") # FDR correction of SPICE values
 
 # figures for paper

@@ -299,8 +299,8 @@ run_stim_analysis <-
       stimulated_models_summary %>%
       rowwise() %>%
       transmute(Panel, CellType, Marker,
-                `Signif (FDR < 0.05)` = if_else(FDR_group < 0.05, "*", "")) %>%
-      bind_cols(model_predictions)
+                `Signif (FDR < 0.05)` = if_else(FDR_group < 0.05, "*", "")) # %>%
+      # bind_cols(model_predictions)
     
     resultsout_pt2 <-
       stimulated_models_summary %>%

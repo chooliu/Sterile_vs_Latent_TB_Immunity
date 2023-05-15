@@ -207,16 +207,67 @@ extract_markers_from_multiple_xlsx <-
 # (look excessive b/c copied from existing personal utility package 'choomisc')
 
 # continuous variables
+summaryMedianIQR <-
+  function(x, digits = 2, na.rm = F,
+           NA_percent_in_brackets = F,
+           NA_count_in_brackets = T,
+           symbol = NULL) {
+    
+    if (!(typeof(x) %in% c("double", "integer"))) {
+      warning("input vector not numeric")
+      x <- as.numeric(x)
+    }
+    
+    n_NA <- sum(is.na(x))
+    ratio_miss <- n_NA / length(x) * 100
+    
+    if (n_NA != 0) {
+      warning(paste0(
+        n_NA,
+        " values are missing/NA in input vector"
+      ))
+    }
+    
+    if (n_NA == length(x)) {
+      warning("all values missing!")
+      return("-")
+    }
+    
+    output <-
+      quantile(x, c(0.25, 0.5, 0.75), na.rm = T)
+    
+    output <- formatC(output, format = "f", digits = digits)
+    
+    output <- ifelse(is.null(symbol),
+                     paste0(output[2], " (", output[1], ", ", output[3], ")"),
+                     paste0(output[2], symbol, " (", output[1], symbol, ", ", output[3], symbol, ")")
+    )
+    
+    if (NA_count_in_brackets & n_NA != 0) {
+      output <-
+        paste0(output, " [", n_NA, "]")
+    }
+    
+    if (NA_percent_in_brackets & n_NA != 0) {
+      output <-
+        ratio_miss %>%
+        formatC(., format = "f", digits = digits) %>%
+        paste0(output, " [", ., "%]")
+    }
+    
+    return(output)
+  }
+
 summaryMedianRange <-
   function(x, digits = 1, na.rm = F,
            NA_percent_in_brackets = F,
            NA_count_in_brackets = T,
            symbol = NULL) {
+    
     if (!(typeof(x) %in% c("double", "integer"))) {
       warning("input vector not numeric")
       x <- as.numeric(x)
     }
-
 
     n_NA <- sum(is.na(x))
     ratio_miss <- n_NA / length(x) * 100

@@ -1,8 +1,37 @@
 # ==============================================================================
-# 09_correlation_heatmaps.R
-# generate correlation heatmaps after covariate residualization
-# ultimately excluded from final m.s., but useful for btwn marker correlation
+# 09_heatmaps.R
+# - show example frequency heatmap for reviewers
+# - generate correlation heatmaps after covariate residualization
+#     (ultimately excluded from final m.s., but used to check test correlation)
 # ==============================================================================
+
+
+
+
+
+# example heatmap of frequencies for unstim differences ========================
+
+heatmap_demo <-
+  resultstable_unstim_lneg_lpos$Results %>%
+  filter(`Signif (FDR < 0.05)` == "*") %>%
+  mutate(to_include = paste0(Marker, CellType)) %>%
+  .$to_include
+heatmap_demo <-
+  deltas_final %>%
+  filter(Group %in% c("LTBI-", "LTBI+")) %>%
+  filter(paste0(Marker, CellType) %in% heatmap_demo) %>%
+  select(PID, Group, Marker, CellType, Percent_NoStim) %>%
+  pivot_wider(id_cols = c(PID, Group),
+              names_from = c(CellType, Marker), names_sep = ", ",
+              values_from = Percent_NoStim)
+filter_heatmap_no_NA <- apply(heatmap_demo, 1, function(x) { !any(is.na(x))})
+Heatmap(name = "% Positivity",
+        column_title = "Unstimulated Differences (FDR < 0.05)",
+        col = viridisLite::cividis(100),
+        heatmap_demo[filter_heatmap_no_NA , -(1:2)],
+        row_split = heatmap_demo$Group[filter_heatmap_no_NA] %>%
+          fct_recode(`LTBI` = "LTBI+", `TB-Resist.` = "LTBI-"),
+        cluster_rows = F)
 
 
 

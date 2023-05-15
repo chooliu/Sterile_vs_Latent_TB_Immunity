@@ -69,9 +69,9 @@ calc_raw_dat_percent <-
     inputdeltadat %>%
       filter(Panel == p_in & CellType == ct_in &
                Marker == m_in & Group == group) %>%
-      summarize(NoStim = mean(Percent_NoStim),
-                Stim = mean(Percent_CMStim),
-                Delta = mean(Percent_CMStim - Percent_NoStim)) %>%
+      summarize(NoStim = summaryMedianIQR(Percent_NoStim),
+                Stim = summaryMedianIQR(Percent_CMStim),
+                Delta = summaryMedianIQR(Percent_CMStim - Percent_NoStim)) %>%
       .[stim] %>%
       unlist
   }
@@ -251,8 +251,8 @@ run_unstim_analysis <-
       unstimulated_models_summary %>%
       rowwise() %>%
       transmute(Panel, CellType, Marker,
-                `Signif (FDR < 0.05)` = if_else(FDR_group < 0.05, "*", "")) %>%
-      bind_cols(model_predictions)
+                `Signif (FDR < 0.05)` = if_else(FDR_group < 0.05, "*", "")) # %>%
+      # bind_cols(model_predictions)
     
     resultsout_pt2 <-
       unstimulated_models_summary %>%

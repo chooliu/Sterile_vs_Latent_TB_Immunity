@@ -107,8 +107,8 @@ list(
     format_headers = F
   )
 
-system('open "./Reports/20220325_TB_R21_CompiledResults.xlsx"')
-
+system(
+  paste0("open ./Reports/", current_date_label, "_TB_R21_CompiledResults.xlsx"))
 
 
 
